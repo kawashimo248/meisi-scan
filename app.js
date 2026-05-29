@@ -17,6 +17,9 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Upload & Image Preview
         dropZone: document.getElementById('drop-zone'),
+        cameraFileInput: document.getElementById('camera-file-input'),
+        btnFileSelect: document.getElementById('btn-file-select'),
+        fileSelectContainer: document.getElementById('file-select-container'),
         imageFileInput: document.getElementById('image-file-input'),
         previewContainer: document.getElementById('preview-container'),
         previewImage: document.getElementById('preview-image'),
@@ -174,11 +177,29 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        // Click triggers camera input
         elements.dropZone.addEventListener('click', () => {
+            if (elements.cameraFileInput) elements.cameraFileInput.click();
+        });
+    }
+
+    // Camera input change event
+    if (elements.cameraFileInput) {
+        elements.cameraFileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleSelectedFile(e.target.files[0]);
+            }
+        });
+    }
+
+    // Button to select file manually
+    if (elements.btnFileSelect) {
+        elements.btnFileSelect.addEventListener('click', () => {
             if (elements.imageFileInput) elements.imageFileInput.click();
         });
     }
 
+    // Normal file input change event
     if (elements.imageFileInput) {
         elements.imageFileInput.addEventListener('change', (e) => {
             if (e.target.files.length > 0) {
@@ -200,6 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (elements.previewImage) elements.previewImage.src = reader.result;
             if (elements.previewContainer) elements.previewContainer.style.display = 'block';
             if (elements.dropZone) elements.dropZone.style.display = 'none';
+            if (elements.fileSelectContainer) elements.fileSelectContainer.style.display = 'none';
             if (elements.btnProcess) elements.btnProcess.disabled = false;
             
             // Base64にエンコード
@@ -213,9 +235,11 @@ document.addEventListener('DOMContentLoaded', () => {
             e.stopPropagation();
             selectedFileBase64 = null;
             selectedFileMime = null;
+            if (elements.cameraFileInput) elements.cameraFileInput.value = '';
             if (elements.imageFileInput) elements.imageFileInput.value = '';
             if (elements.previewContainer) elements.previewContainer.style.display = 'none';
             if (elements.dropZone) elements.dropZone.style.display = 'flex';
+            if (elements.fileSelectContainer) elements.fileSelectContainer.style.display = 'flex';
             if (elements.btnProcess) elements.btnProcess.disabled = true;
             if (elements.resultSection) elements.resultSection.style.display = 'none';
         });

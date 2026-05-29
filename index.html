@@ -48,9 +48,20 @@
             <!-- Drop & Camera Select Zone -->
             <div id="drop-zone" class="drop-zone">
                 <i data-lucide="camera" style="width: 48px; height: 48px;"></i>
-                <div class="drop-zone-text">名刺の写真を撮影または選択</div>
-                <div class="drop-zone-sub">ドラッグ＆ドロップ、またはここをクリック</div>
-                <!-- Input field hidden -->
+                <div class="drop-zone-text">カメラを起動して名刺を撮影</div>
+                <div class="drop-zone-sub">タップしてカメラを起動します</div>
+                <!-- Input field hidden for camera -->
+                <input type="file" id="camera-file-input" accept="image/*" capture="environment" style="display: none;">
+            </div>
+
+            <!-- File Select Area -->
+            <div id="file-select-container" class="file-select-container">
+                <div class="or-separator">または</div>
+                <button id="btn-file-select" class="btn-secondary" type="button">
+                    <i data-lucide="image" style="width: 18px; height: 18px;"></i>
+                    <span>ファイルから写真を選択</span>
+                </button>
+                <!-- Input field hidden for normal file select -->
                 <input type="file" id="image-file-input" accept="image/*" style="display: none;">
             </div>
 
