@@ -89,6 +89,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function loadSavedKeys() {
+        if (elements.geminiApiKey) {
+            elements.geminiApiKey.value = getApiKey();
+        }
+        checkApiKeyConfigured();
+    }
+
     // Toggle API Key password visibility
     if (elements.toggleVisibilityBtns) {
         elements.toggleVisibilityBtns.forEach(btn => {
@@ -108,13 +115,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         });
-    }
-
-    function loadSavedKeys() {
-        if (elements.geminiApiKey) {
-            elements.geminiApiKey.value = getApiKey();
-        }
-        checkApiKeyConfigured();
     }
 
     // Settings Modal Actions
@@ -250,22 +250,23 @@ document.addEventListener('DOMContentLoaded', () => {
     // ---------------------------------------------------------
     if (elements.btnProcess) {
         elements.btnProcess.addEventListener('click', async () => {
-            const key = getApiKey();
-            if (!key.trim()) {
-                alert('Gemini APIキーを設定してください。画面右上の設定アイコンから登録できます。');
-                if (elements.btnSettingsToggle) elements.btnSettingsToggle.click();
-                return;
-            }
+            try {
+                const key = getApiKey();
+                if (!key.trim()) {
+                    alert('Gemini APIキーを設定してください。画面右上の設定アイコンから登録できます。');
+                    if (elements.btnSettingsToggle) elements.btnSettingsToggle.click();
+                    return;
+                }
 
-            if (!selectedFileBase64) {
-                alert('名刺の画像を選択してください。');
-                return;
-            }
+                if (!selectedFileBase64) {
+                    alert('名刺の画像を選択してください。');
+                    return;
+                }
 
-            showLoading(true);
+                showLoading(true);
 
-            // 名刺の解析指示プロンプト（ふりがな除外版）
-            const prompt = `あなたは優秀なビジネスアシスタントです。添付された名刺画像を注意深く読み取って、記載されている情報を正確にデータ化してください。
+                // 名刺の解析指示プロンプト（ふりがな除外版）
+                const prompt = `あなたは優秀なビジネスアシスタントです。添付された名刺画像を注意深く読み取って、記載されている情報を正確にデータ化してください。
 以下項目を読み取り、誤変換や文字化け、1とlの誤認などがあれば文脈から自己修正して、整理された綺麗なテキスト形式で出力してください。名刺内に該当する記載がない場合は、省略するのではなく「項目（記載なし）」と出力してください。
 
 【出力する項目】
@@ -286,59 +287,60 @@ document.addEventListener('DOMContentLoaded', () => {
 【出力フォーマット】
 余計な前置き（「解析しました」など）や挨拶文、マークダウンコードブロック記号（\`\`\`など）は一切出力しないでください。上記の「【出力する項目】」の内容だけを、直接テキストとして出力してください。`;
 
-            const payload = {
-                contents: [{
-                    parts: [
-                        {
-                            inlineData: {
-                                mimeType: selectedFileMime,
-                                data: selectedFileBase64
+                const payload = {
+                    contents: [{
+                        parts: [
+                            {
+                                inlineData: {
+                                    mimeType: selectedFileMime,
+                                    data: selectedFileBase64
+                                }
+                            },
+                            {
+                                text: prompt
                             }
-                        },
-                        {
-                            text: prompt
-                        }
-                    ]
-                }]
-            };
+                        ]
+                    }]
+                };
 
-            const apiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${key}`;
-            
-            const response = await fetch(apiEndpoint, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(payload)
-            });
+                const apiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${key}`;
+                
+                const response = await fetch(apiEndpoint, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(payload)
+                });
 
-            if (!response.ok) {
-                const errData = await response.json().catch(() => ({}));
-                const apiErrorMessage = errData.error?.message || `HTTP status: ${response.status}`;
-                throw new Error(`Gemini APIエラー: ${apiErrorMessage}`);
+                if (!response.ok) {
+                    const errData = await response.json().catch(() => ({}));
+                    const apiErrorMessage = errData.error?.message || `HTTP status: ${response.status}`;
+                    throw new Error(`Gemini APIエラー: ${apiErrorMessage}`);
+                }
+
+                const data = await response.json();
+                let resultText = "";
+                try {
+                    resultText = data.candidates[0].content.parts[0].text.trim();
+                } catch (e) {
+                    throw new Error("解析結果の読み込みに失敗しました。APIの応答が想定外です。");
+                }
+
+                // 結果の表示
+                if (elements.resultBox) elements.resultBox.value = resultText;
+                if (elements.resultSection) elements.resultSection.style.display = 'block';
+                
+                // 解析成功時に結果エリアまでスムーズスクロール
+                elements.resultSection.scrollIntoView({ behavior: 'smooth' });
+
+            } catch (error) {
+                console.error("解析エラー:", error);
+                alert(`名刺の解析中にエラーが発生しました:\n${error.message}`);
+            } finally {
+                showLoading(false);
             }
-
-            const data = await response.json();
-            let resultText = "";
-            try {
-                resultText = data.candidates[0].content.parts[0].text.trim();
-            } catch (e) {
-                throw new Error("解析結果の読み込みに失敗しました。APIの応答が想定外です。");
-            }
-
-            // 結果の表示
-            if (elements.resultBox) elements.resultBox.value = resultText;
-            if (elements.resultSection) elements.resultSection.style.display = 'block';
-            
-            // 解析成功時に結果エリアまでスムーズスクロール
-            elements.resultSection.scrollIntoView({ behavior: 'smooth' });
-
-        } catch (error) {
-            console.error("解析エラー:", error);
-            alert(`名刺の解析中にエラーが発生しました:\n${error.message}`);
-        } finally {
-            showLoading(false);
-        }
+        });
     }
 
     // ---------------------------------------------------------
