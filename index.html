@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI名刺読み取りアシスタント</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@400;600;700;800&family=Noto+Sans+JP:wght@400;700&family=Outfit:wght@600;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="bg-glow"></div>
+
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="logo-area">
+                <i data-lucide="contact-2" style="width: 24px; height: 24px;"></i>
+            </div>
+            <h1>AI名刺読み取りアシスタント</h1>
+            <p class="subtitle">カメラで撮影するか画像を選択するだけで、連絡先を自動整理</p>
+            
+            <!-- Settings Modal Trigger -->
+            <button id="btn-settings-toggle" class="btn-settings-toggle" title="設定">
+                <i data-lucide="settings" style="width: 18px; height: 18px;"></i>
+            </button>
+        </header>
+
+        <!-- API Status Banner Warning -->
+        <div id="api-status-banner" class="api-warning-banner hidden">
+            <i data-lucide="alert-circle" style="width: 16px; height: 16px;"></i>
+            <span>Gemini APIキーが設定されていません。タップして登録してください。</span>
+        </div>
+
+        <!-- Main UI Card -->
+        <main class="main-card">
+            <!-- Drop & Camera Select Zone -->
+            <div id="drop-zone" class="drop-zone">
+                <i data-lucide="camera" style="width: 48px; height: 48px;"></i>
+                <div class="drop-zone-text">名刺の写真を撮影または選択</div>
+                <div class="drop-zone-sub">ドラッグ＆ドロップ、またはここをクリック</div>
+                <!-- Input field hidden -->
+                <input type="file" id="image-file-input" accept="image/*" style="display: none;">
+            </div>
+
+            <!-- Image Preview Area -->
+            <div id="preview-container" class="preview-container">
+                <img id="preview-image" src="" alt="名刺プレビュー" class="preview-image">
+                <button id="btn-clear-preview" class="btn-clear-preview" title="画像を消去">
+                    <i data-lucide="x" style="width: 16px; height: 16px;"></i>
+                </button>
+            </div>
+
+            <!-- Action Button -->
+            <button id="btn-process" class="btn-action" disabled>
+                <i data-lucide="cpu" style="width: 18px; height: 18px;"></i>
+                <span>名刺をスキャンする</span>
+            </button>
+
+            <!-- Loading Spinner Overlay -->
+            <div id="loading-overlay" class="loading-overlay">
+                <div class="spinner"></div>
+                <div id="loading-text" class="loading-text">AIが名刺画像を解析中...</div>
+            </div>
+
+            <!-- Result Section -->
+            <div id="result-section" class="result-section">
+                <div class="result-header">
+                    <div class="result-title">
+                        <i data-lucide="check-circle-2" style="width: 16px; height: 16px;"></i>
+                        解析結果（整理済みテキスト）
+                    </div>
+                    <button id="btn-copy" class="btn-copy">
+                        <i data-lucide="copy" style="width: 14px; height: 14px;"></i>
+                        コピー
+                    </button>
+                </div>
+                <textarea id="result-box" class="result-box" readonly></textarea>
+            </div>
+        </main>
+
+        <!-- Security and Info Alert -->
+        <div class="info-alert">
+            <i data-lucide="shield-check" style="width: 18px; height: 18px; margin-top: 2px;"></i>
+            <div>
+                <p style="font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">個人情報保護・セキュリティについて</p>
+                <p>読み取った名刺の画像やテキストデータは、一切データベースに保存されません。ブラウザ内およびGoogle API（Gemini）への直接通信のみで処理されるため、社外への情報漏洩の心配がなくセキュアにご利用いただけます。</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- API Key Settings Modal -->
+    <div id="settings-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">API設定</div>
+                <button id="btn-settings-close" class="btn-close">
+                    <i data-lucide="x" style="width: 20px; height: 20px;"></i>
+                </button>
+            </div>
+            
+            <div class="form-group">
+                <label for="gemini-api-key" class="form-label">Gemini APIキー</label>
+                <div class="input-container">
+                    <input type="password" id="gemini-api-key" class="form-input" placeholder="Google AI Studioで取得したAPIキーを入力">
+                    <button class="btn-toggle-visibility" data-target="gemini-api-key" type="button">
+                        <i data-lucide="eye" style="width: 18px; height: 18px;"></i>
+                    </button>
+                </div>
+                <p style="font-size: 0.7rem; color: var(--text-secondary); margin-top: 6px;">
+                    ※議事録アプリで登録済みの場合は、そのキーが自動で適用されます。
+                </p>
+            </div>
+
+            <button id="btn-settings-save" class="btn-action" style="background: var(--accent-grad); box-shadow: none;">
+                <i data-lucide="save" style="width: 16px; height: 16px;"></i>
+                設定を保存する
+            </button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
