@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 3. API Key Management (LocalStorage)
     // ---------------------------------------------------------
     function getApiKey() {
-        // 議事録自動作成アプリと同一のキー名（gemini_api_key）を再利用
+        // 議事録自動作成アプリと同一のキー名「gemini_api_key」を再利用
         return localStorage.getItem('gemini_api_key') || '';
     }
 
@@ -87,13 +87,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 elements.apiStatusBanner.classList.remove('hidden');
             }
         }
-    }
-
-    function loadSavedKeys() {
-        if (elements.geminiApiKey) {
-            elements.geminiApiKey.value = getApiKey();
-        }
-        checkApiKeyConfigured();
     }
 
     // Toggle API Key password visibility
@@ -115,6 +108,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         });
+    }
+
+    function loadSavedKeys() {
+        if (elements.geminiApiKey) {
+            elements.geminiApiKey.value = getApiKey();
+        }
+        checkApiKeyConfigured();
     }
 
     // Settings Modal Actions
@@ -262,37 +262,29 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            runOcrProcess(key);
-        });
-    }
+            showLoading(true);
 
-    async function runOcrProcess(key) {
-        showLoading(true);
-        if (elements.resultSection) elements.resultSection.style.display = 'none';
-
-        try {
-            // 名刺の解析指示プロンプト
-            const prompt = `
-あなたは優秀なビジネスアシスタントです。添付された名刺画像を注意深く読み取って、記載されている情報を正確にデータ化してください。
-
-以下の各項目を読み取り、誤変換や文字化け（1とlの誤認など）があれば文脈から自己修正して、整理された綺麗なテキスト形式で出力してください。
-名刺内に該当する記載がない項目は、省略するのではなく「項目名: (記載なし)」と出力してください。
+            // 名刺の解析指示プロンプト（ふりがな除外版）
+            const prompt = `あなたは優秀なビジネスアシスタントです。添付された名刺画像を注意深く読み取って、記載されている情報を正確にデータ化してください。
+以下項目を読み取り、誤変換や文字化け、1とlの誤認などがあれば文脈から自己修正して、整理された綺麗なテキスト形式で出力してください。名刺内に該当する記載がない場合は、省略するのではなく「項目（記載なし）」と出力してください。
 
 【出力する項目】
-■ 会社名：
-■ 部署・役職：
-■ 氏名（ふりがな）： ※ふりがなが名刺に書かれている場合、または日本の人名で推測できる場合は（）内にふりがなを記載してください。
-■ 電話番号： ※固定電話、携帯電話、FAXなどがあれば分けて記載してください。
-■ メールアドレス：
-■ 郵便番号・住所： ※郵便番号（〒123-4567）も含めて記載してください。
-■ ウェブサイトURL：
-■ その他（備考）： ※ロゴマークの文字、キャッチコピー、英語表記など、上記に含まれない特記事項があれば記載してください。
+■ 会社名
+■ 部署・役職
+■ 氏名
+※ふりがなは一切出力しないでください。名刺にふりがなが書かれていても除外し、漢字やアルファベットの氏名のみを出力してください。
+■ 電話番号
+※固定電話、携帯電話、FAXなどがあれば全て記載してください。
+■ メールアドレス
+■ 郵便番号・住所
+※郵便番号（123-4567等）も含めて記載してください。
+■ ウェブサイトURL
+■ その他（備考）
+※ロゴマークの文字、キャッチコピー、英語表記など、上記に含まれない記載項目があれば記載してください。
 
 ---
 【出力フォーマット】
-余計な前置き（「解析しました」など）や挨拶文、マークダウンコードのブロック記号（\`\`\`）などは一切出力しないでください。
-上記の「【出力する項目】」の内容だけを、直接テキストとして出力してください。
-`;
+余計な前置き（「解析しました」など）や挨拶文、マークダウンコードブロック記号（\`\`\`など）は一切出力しないでください。上記の「【出力する項目】」の内容だけを、直接テキストとして出力してください。`;
 
             const payload = {
                 contents: [{
