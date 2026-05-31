@@ -31,6 +31,11 @@
             <h1>AI名刺読み取りアシスタント</h1>
             <p class="subtitle">カメラで撮影するか画像を選択するだけで、連絡先を自動整理</p>
             
+            <!-- Help Modal Trigger -->
+            <button id="btn-help-toggle" class="btn-help-toggle" title="取扱説明書">
+                <i data-lucide="help-circle" style="width: 18px; height: 18px;"></i>
+            </button>
+
             <!-- Settings Modal Trigger -->
             <button id="btn-settings-toggle" class="btn-settings-toggle" title="設定">
                 <i data-lucide="settings" style="width: 18px; height: 18px;"></i>
@@ -138,6 +143,61 @@
                 <i data-lucide="save" style="width: 16px; height: 16px;"></i>
                 設定を保存する
             </button>
+        </div>
+    </div>
+
+    <!-- Help / Instruction Modal -->
+    <div id="help-modal" class="modal hidden">
+        <div class="modal-content help-modal-content">
+            <div class="modal-header">
+                <div class="modal-title" style="display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="help-circle" style="width: 20px; height: 20px; color: var(--primary);"></i>
+                    <span>取扱説明書（導入・設定）</span>
+                </div>
+                <button id="btn-help-close" class="btn-close">
+                    <i data-lucide="x" style="width: 20px; height: 20px;"></i>
+                </button>
+            </div>
+            <div class="modal-body help-modal-body">
+                <h2>📱 ホーム画面への追加（推奨）</h2>
+                <p>本アプリは、スマートフォンのホーム画面に追加することで、アドレスバーが非表示になり、通常のスマホアプリと全く同じ<strong>「全画面表示」</strong>で快適に起動できるようになります。</p>
+                
+                <h3>🍎 iPhone (Safari) の設定手順</h3>
+                <ol>
+                    <li><strong>Safari</strong> でアプリのURLを開きます。</li>
+                    <li>画面下部中央にある<strong>「共有」ボタン</strong>（□から上矢印が出ているアイコン）をタップします。</li>
+                    <li>メニューを下へスクロールし、<strong>「ホーム画面に追加」</strong>を選択します。</li>
+                    <li>画面右上の<strong>「追加」</strong>をタップすると、ホーム画面に「名刺読取」アイコンが追加されます。</li>
+                </ol>
+
+                <h3>🤖 Android (Chrome) の設定手順</h3>
+                <ol>
+                    <li><strong>Chrome</strong> でアプリのURLを開きます。</li>
+                    <li>画面右上にある<strong>「3つのドット（メニュー）」</strong>アイコンをタップします。</li>
+                    <li>メニューから<strong>「アプリをインストール」</strong>（または「ホーム画面に追加」）を選択します。</li>
+                    <li>確認画面で「インストール」または「追加」をタップします。</li>
+                </ol>
+
+                <h2>📖 基本的な使い方</h2>
+                <ol>
+                    <li>ホーム画面のアイコンからアプリを起動します。</li>
+                    <li><strong>「カメラを起動して名刺を撮影」</strong>エリアをタップし、スマホのカメラで名刺を撮影します（または「ファイルから写真を選択」で画像ファイルを選びます）。</li>
+                    <li>プレビューを確認し、<strong>「名刺をスキャンする」</strong>ボタンをタップします。</li>
+                    <li>数秒でAIが解析したテキストが画面下部に整理されて表示されます。</li>
+                    <li><strong>「コピー」</strong>ボタンをタップすると、クリップボードに一括コピーされますので、社内システムやExcelなどに貼り付けてご利用ください。</li>
+                </ol>
+
+                <blockquote>
+                    <p>💡 <strong>事前設定の注意点</strong><br>
+                    ご利用前に、画面右上の歯車マーク（設定）から「Gemini APIキー」が登録されている必要があります。（同一ブラウザで議事録アプリをご利用中の場合は、自動で引き継がれるため再設定は不要です）</p>
+                </blockquote>
+
+                <h2>🔒 セキュリティと個人情報の取り扱い</h2>
+                <ul>
+                    <li><strong>データの完全保護:</strong> 読み取った名刺の画像やテキストデータは、<strong>社内外のサーバーやデータベースに一切保存されません</strong>。</li>
+                    <li><strong>ブラウザ直接通信:</strong> 処理はすべて利用者のブラウザ（スマートフォン内）と、Googleの暗号化されたAPI通信（SSL/HTTPS）のみで完結するため、情報洩れや不正アクセスの心配がなく安全です。</li>
+                </ul>
+            </div>
         </div>
     </div>
 
